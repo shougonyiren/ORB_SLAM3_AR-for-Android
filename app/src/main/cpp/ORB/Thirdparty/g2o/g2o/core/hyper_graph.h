@@ -35,10 +35,10 @@
 #include <limits>
 #include <cstddef>
 
-#if (__cplusplus >= 201103L) || (_MSC_VER >= 1600) // C++11
+#ifdef _MSC_VER
 #include <unordered_map>
 #else
-#include <tr1/unordered_map>
+#include <unordered_map>
 #endif
 
 
@@ -90,12 +90,7 @@ namespace g2o {
       typedef std::set<Edge*>                           EdgeSet;
       typedef std::set<Vertex*>                         VertexSet;
 
-#if (__cplusplus >= 201103L) || (_MSC_VER >= 1600) // C++11
-      typedef std::unordered_map<int, Vertex*>          VertexIDMap;
-#else
-      typedef std::tr1::unordered_map<int, Vertex*>     VertexIDMap;
-#endif
-
+      typedef std::unordered_map<int, Vertex*>     VertexIDMap;
       typedef std::vector<Vertex*>                      VertexContainer;
 
       //! abstract Vertex, your types must derive from that one

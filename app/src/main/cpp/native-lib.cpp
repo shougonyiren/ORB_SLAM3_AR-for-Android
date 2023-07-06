@@ -47,7 +47,7 @@ void save_as_binary(ORB_SLAM3::ORBVocabulary* voc, const std::string outfile) {
 
 void txt_2_bin(){
     ORB_SLAM3::ORBVocabulary* voc = new ORB_SLAM3::ORBVocabulary();
-
+    LOGE("txt_2_bin()");
     load_as_text(voc, "/storage/emulated/0/SLAM/VOC/ORBvoc.txt");
     save_as_binary(voc, "/storage/emulated/0/SLAM/VOC/ORBvoc.bin");
 }
@@ -69,7 +69,8 @@ Java_com_vslam_orbslam3_vslamactivity_VslamActivity_CVTest(JNIEnv *env, jobject 
 #else
 
     if(!SLAM)
-    { 
+    {
+        txt_2_bin();
         SLAM = new ORB_SLAM3::System("/storage/emulated/0/SLAM/VOC/ORBvoc.bin","/storage/emulated/0/SLAM/Calibration/PARAconfig.yaml",ORB_SLAM3::System::MONOCULAR,false);
        //imageScale = SLAM->GetImageScale();
        

@@ -29,10 +29,9 @@ set(SRCS_DUTILS
   DUtils/Timestamp.cpp)
 
 
-#find_package(OpenCV 4 QUIET)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4 QUIET)
 if(NOT OpenCV_FOUND)
-   find_package(OpenCV 3.0 REQUIRED)
+   find_package(OpenCV 3.0 QUIET)
    if(NOT OpenCV_FOUND)
       message(FATAL_ERROR "OpenCV > 3.0 not found.")
    endif()

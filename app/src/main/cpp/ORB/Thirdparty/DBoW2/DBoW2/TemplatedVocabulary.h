@@ -1467,7 +1467,7 @@ template<class TDescriptor, class F>
 bool TemplatedVocabulary<TDescriptor,F>::loadFromBinaryFile(const std::string &filename) {
   fstream f;
   f.open(filename.c_str(), ios_base::in|ios::binary);
-  unsigned int nb_nodes, size_node;
+  unsigned int nb_nodes=0, size_node=0;
   f.read((char*)&nb_nodes, sizeof(nb_nodes));
   f.read((char*)&size_node, sizeof(size_node));
   f.read((char*)&m_k, sizeof(m_k));

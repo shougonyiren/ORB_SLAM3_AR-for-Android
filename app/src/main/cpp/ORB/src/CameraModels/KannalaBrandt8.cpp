@@ -191,8 +191,10 @@ namespace ORB_SLAM3 {
         cv::Mat D = (cv::Mat_<float>(4,1) << mvParameters[4], mvParameters[5], mvParameters[6], mvParameters[7]);
         cv::Mat R = cv::Mat::eye(3,3,CV_32F);
         cv::Mat K = this->toK();
-        cv::fisheye::undistortPoints(vPts1,vPts1,K,D,R,K);
-        cv::fisheye::undistortPoints(vPts2,vPts2,K,D,R,K);
+        printf("###gyj###cv::fisheye::undistortPoints(vPts1,vPts1,K,D,R,K);");
+        //todo
+//        cv::fisheye::undistortPoints(vPts1,vPts1,K,D,R,K);
+//        cv::fisheye::undistortPoints(vPts2,vPts2,K,D,R,K);
 
         for(size_t i = 0; i < vKeys1.size(); i++) vKeysUn1[i].pt = vPts1[i];
         for(size_t i = 0; i < vKeys2.size(); i++) vKeysUn2[i].pt = vPts2[i];

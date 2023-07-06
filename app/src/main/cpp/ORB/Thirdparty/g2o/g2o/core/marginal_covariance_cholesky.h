@@ -33,10 +33,10 @@
 #include <cassert>
 #include <vector>
 
-#if (__cplusplus >= 201103L) || (_MSC_VER >= 1600) // C++11
+#ifdef _MSC_VER
 #include <unordered_map>
 #else
-#include <tr1/unordered_map>
+#include <unordered_map>
 #endif
 
 
@@ -50,12 +50,8 @@ namespace g2o {
       /**
        * hash struct for storing the matrix elements needed to compute the covariance
        */
-#if (__cplusplus >= 201103L) || (_MSC_VER >= 1600) // C++11
-      typedef std::unordered_map<int, double>          LookupMap;
-#else
-      typedef std::tr1::unordered_map<int, double>     LookupMap;
-#endif
-
+      typedef std::unordered_map<int, double>     LookupMap;
+    
     public:
       MarginalCovarianceCholesky();
       ~MarginalCovarianceCholesky();
