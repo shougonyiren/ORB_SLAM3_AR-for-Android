@@ -61,7 +61,9 @@ cv::Point2f Camera2Pixel(cv::Mat poseCamera,cv::Mat mk){
 
 extern "C"
 JNIEXPORT jfloatArray JNICALL
-Java_com_vslam_orbslam3_vslamactivity_VslamActivity_CVTest(JNIEnv *env, jobject instance, jlong matAddr) {
+Java_com_vslam_orbslam3_vslamactivity_VslamActivity_CVTest(JNIEnv *env, jobject instance, jlong matAddr,
+                                                           jfloatArray accel_values,
+                                                           jfloatArray gyro_values) {
 #ifndef BOWISBIN
     if(tframe == 0)
     txt_2_bin();
@@ -75,8 +77,22 @@ Java_com_vslam_orbslam3_vslamactivity_VslamActivity_CVTest(JNIEnv *env, jobject 
        //imageScale = SLAM->GetImageScale();
        
     }
+
+    jfloat* accelFloat = (jfloat*)env->GetFloatArrayElements(accel_values, 0);
+
+    jfloat* gyroFloat = (jfloat*)env->GetFloatArrayElements(gyro_values, 0);
+
+
+//    for(int i=0; i < featureSize1; i++){
+//        featureVector1.push_back(featureData1[i]);
+//        featureVector2.push_back(featureData2[i]);
+//    }
+//
+
+
     cv::Mat *pMat = (cv::Mat*)matAddr;
     cv::Mat pose;
+
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     tframe  = std::chrono::duration_cast < std::chrono::duration < double >> (t1 - t0).count();
@@ -84,7 +100,15 @@ Java_com_vslam_orbslam3_vslamactivity_VslamActivity_CVTest(JNIEnv *env, jobject 
     cout << "tframe = " << tframe << endl;
     clock_t start,end;
     start=clock();
-    Sophus::SE3f Tcw_SE3f = SLAM->TrackMonocular(*pMat,tframe); // TODO change to monocular_inertial
+    vector<ORB_SLAM3::IMU::Point> vImuMeas =   vector<ORB_SLAM3::IMU::Point>();
+
+    cv::Point3f accelPoint3f = cv::Point3f(accelFloat[0], accelFloat[1], accelFloat[2]);
+    LOGI("##accelFloat[0,1,2] =%f %f  %f",accelFloat[0] ,accelFloat[1] ,accelFloat[2]);
+    cv::Point3f gyroPoint3f = cv::Point3f(gyroFloat[0], gyroFloat[1], gyroFloat[2]);
+    LOGI("##gyroFloat[0,1,2] =%f %f  %f",gyroFloat[0] ,gyroFloat[1] ,gyroFloat[2]);
+    vImuMeas.push_back(ORB_SLAM3::IMU::Point(accelPoint3f,gyroPoint3f,tframe));
+
+    Sophus::SE3f Tcw_SE3f = SLAM->TrackMonocular(*pMat,tframe,vImuMeas); // TODO change to monocular_inertial
     Eigen::Matrix4f Tcw_Matrix = Tcw_SE3f.matrix();
     cv::eigen2cv(Tcw_Matrix, pose);
     end = clock();

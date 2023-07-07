@@ -2,8 +2,13 @@ package com.vslam.orbslam3.vslamactivity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +37,7 @@ import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.List;
 
-public class VslamActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class VslamActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 , SensorEventListener {
 
     private static final String TAG = "VslamActivity";
     private GLSurfaceView glSurfaceView;
@@ -41,6 +46,18 @@ public class VslamActivity extends Activity implements CameraBridgeViewBase.CvCa
     private TextView myTextView;
     public static double SCALE = 1;
     private static long count = 0;
+
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private Sensor gyroscope;
+
+
+    private float[] accelValues = new float[3];
+    private float[] gyroValues = new float[3];
+//    private float[] magValues = new float[3];
+    private float[] orientationValues = new float[3];
+    private float[] rotationMatrix = new float[9];
+
     /**
      * Called when the activity is first created.
      */
@@ -143,6 +160,14 @@ public class VslamActivity extends Activity implements CameraBridgeViewBase.CvCa
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
+
     }
 
     @Override
@@ -191,7 +216,7 @@ public class VslamActivity extends Activity implements CameraBridgeViewBase.CvCa
         System.loadLibrary("native-lib");
     }
     //private native float[] CVTest(long matAddr, String timeStamp);  //调用 c++代码
-    private native float[] CVTest(long matAddr);  //调用 c++代码
+    private native float[] CVTest(long matAddr, float[] accelValues, float[] gyroValues);  //调用 c++代码
 
     /**
      * 处理图像的函数，这个函数在相机刷新每一帧都会调用一次，而且每次的输入参数就是当前相机视图信息
@@ -203,7 +228,7 @@ public class VslamActivity extends Activity implements CameraBridgeViewBase.CvCa
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         Mat rgb = inputFrame.rgba();
-        float[] poseMatrix = CVTest(rgb.getNativeObjAddr()); //从slam系统获得相机位姿矩阵
+        float[] poseMatrix = CVTest(rgb.getNativeObjAddr(),accelValues,gyroValues); //从slam系统获得相机位姿矩阵
 
         if (poseMatrix.length != 0) {
             double[][] pose = new double[4][4];
@@ -384,4 +409,63 @@ public class VslamActivity extends Activity implements CameraBridgeViewBase.CvCa
         }
     }
 
+    /**
+     * Called when there is a new sensor event.  Note that "on changed"
+     * is somewhat of a misnomer, as this will also be called if we have a
+     * new reading from a sensor with the exact same sensor values (but a
+     * newer timestamp).
+     *
+     * <p>See {@link SensorManager SensorManager}
+     * for details on possible sensor types.
+     * <p>See also {@link SensorEvent SensorEvent}.
+     *
+     * <p><b>NOTE:</b> The application doesn't own the
+     * {@link SensorEvent event}
+     * object passed as a parameter and therefore cannot hold on to it.
+     * The object may be part of an internal pool and may be reused by
+     * the framework.
+     *
+     * @param event the {@link SensorEvent SensorEvent}.
+     */
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        switch (event.sensor.getType()) {
+            case Sensor.TYPE_ACCELEROMETER:
+                accelValues = event.values.clone();
+                break;
+            case Sensor.TYPE_GYROSCOPE:
+                gyroValues = event.values.clone();
+                break;
+//            case Sensor.TYPE_MAGNETIC_FIELD:
+//                magValues = event.values.clone();
+//                break;
+        }
+//        SensorManager.getRotationMatrix(rotationMatrix, null, accelValues, magValues);
+//        SensorManager.getOrientation(rotationMatrix, orientationValues);
+//        float[] kalmanInput = new float[6];
+//        kalmanInput[0] = gyroValues[0];
+//        kalmanInput[1] = gyroValues[1];
+//        kalmanInput[2] = gyroValues[2];
+//        kalmanInput[3] = accelValues[0];
+//        kalmanInput[4] = accelValues[1];
+//        kalmanInput[5] = accelValues[2];
+
+        // do something with the roll, pitch and yaw values
+    }
+
+    /**
+     * Called when the accuracy of the registered sensor has changed.  Unlike
+     * onSensorChanged(), this is only called when this accuracy value changes.
+     *
+     * <p>See the SENSOR_STATUS_* constants in
+     * {@link SensorManager SensorManager} for details.
+     *
+     * @param sensor
+     * @param accuracy The new accuracy of this sensor, one of
+     *                 {@code SensorManager.SENSOR_STATUS_*}
+     */
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
 }
