@@ -72,8 +72,8 @@ Java_com_vslam_orbslam3_vslamactivity_VslamActivity_CVTest(JNIEnv *env, jobject 
 
     if(!SLAM)
     {
-       // txt_2_bin();
-        SLAM = new ORB_SLAM3::System("/storage/emulated/0/SLAM/VOC/ORBvoc.bin","/storage/emulated/0/SLAM/Calibration/PARAconfig.yaml",ORB_SLAM3::System::IMU_MONOCULAR,false);
+       //txt_2_bin();
+        SLAM = new ORB_SLAM3::System("/storage/emulated/0/SLAM/VOC/ORBvoc.bin","/storage/emulated/0/SLAM/Calibration/PARAconfig.yaml",ORB_SLAM3::System::MONOCULAR,false);
        //imageScale = SLAM->GetImageScale();
        
     }
@@ -101,12 +101,17 @@ Java_com_vslam_orbslam3_vslamactivity_VslamActivity_CVTest(JNIEnv *env, jobject 
     clock_t start,end;
     start=clock();
     vector<ORB_SLAM3::IMU::Point> vImuMeas =   vector<ORB_SLAM3::IMU::Point>();
-
-    cv::Point3f accelPoint3f = cv::Point3f(accelFloat[0], accelFloat[1], accelFloat[2]);
-    LOGI("##accelFloat[0,1,2] =%f %f  %f",accelFloat[0] ,accelFloat[1] ,accelFloat[2]);
-    cv::Point3f gyroPoint3f = cv::Point3f(gyroFloat[0], gyroFloat[1], gyroFloat[2]);
-    LOGI("##gyroFloat[0,1,2] =%f %f  %f",gyroFloat[0] ,gyroFloat[1] ,gyroFloat[2]);
-    vImuMeas.push_back(ORB_SLAM3::IMU::Point(accelPoint3f,gyroPoint3f,tframe));
+    for (int i = 0; accelFloat[3 * i] == 0; i++) {
+        cv::Point3f accelPoint3f = cv::Point3f(accelFloat[3 * i], accelFloat[3 * i + 1],
+                                               accelFloat[3 * i + 2]);
+        LOGI("##accelFloat[0,1,2] =%f %f  %f", accelFloat[3 * i + 0], accelFloat[3 * i + 1],
+             accelFloat[3 * i + 2]);
+        cv::Point3f gyroPoint3f = cv::Point3f(gyroFloat[3 * i + 0], gyroFloat[3 * i + 1],
+                                              gyroFloat[3 * i + 2]);
+        LOGI("##gyroFloat[0,1,2] =%f %f  %f", gyroFloat[3 * i + 0], gyroFloat[3 * i + 1],
+             gyroFloat[3 * i + 2]);
+        vImuMeas.push_back(ORB_SLAM3::IMU::Point(accelPoint3f, gyroPoint3f, tframe));
+    }
 
     Sophus::SE3f Tcw_SE3f = SLAM->TrackMonocular(*pMat,tframe,vImuMeas); // TODO change to monocular_inertial
     Eigen::Matrix4f Tcw_Matrix = Tcw_SE3f.matrix();
