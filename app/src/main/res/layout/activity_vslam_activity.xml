@@ -12,6 +12,7 @@
         opencv:show_fps="true"
         opencv:camera_id="any" />
 
+
     <TextView
         android:id="@+id/myTextView"
         android:layout_width="wrap_content"
@@ -26,6 +27,18 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
+    <com.arashivision.sdkmedia.player.capture.InstaCapturePlayerView
+        android:id="@+id/player_capture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@android:color/darker_gray" />
+    <ImageView
+        android:id="@+id/mOpenCvCameraView1"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:visibility="gone"
+        android:background="@android:color/holo_blue_bright"/>
     <SeekBar
         android:id="@+id/mySeekBar"
         android:layout_width="fill_parent"

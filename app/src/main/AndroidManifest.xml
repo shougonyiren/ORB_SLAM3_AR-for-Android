@@ -31,12 +31,24 @@
         android:smallScreens="true" />
 
     <application
+        android:name=".MyApp"
         android:label="@string/app_name"
         android:icon="@drawable/orbslam3"
         android:theme="@android:style/Theme.Translucent"
         android:requestLegacyExternalStorage="true">
+        <activity android:name=".VslamActivity123"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:configChanges="keyboardHidden|orientation"
+            android:exported="true">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+        </activity>
         <activity android:name=".VslamActivity"
             android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:configChanges="keyboardHidden|orientation"
             android:exported="true">
             <intent-filter>
